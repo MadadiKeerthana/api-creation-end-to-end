@@ -1,0 +1,14 @@
+[Unit]
+Description=gunicorn instance to server api
+After=network.target
+
+[Service]
+User=keerthana
+Group=keerthana
+WorkingDirectory=/home/keerthana/app/src/
+Environment="PATH=/home/keerthana/app/venv/bin"
+EnvironmentFile=/home/keerthana/.env
+ExecStart=/home/keerthana/app/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
