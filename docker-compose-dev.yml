@@ -1,0 +1,45 @@
+#look for compose version that has the feature you need
+version: "3"
+
+#services are like containers
+services:
+  #name of first service is api
+  api:
+    #same as docker build .
+    build: .
+    depends_on:
+      - postgres
+    #open ports assess our container
+    #can be []list or bullet points
+    #<port on localhost>:<port on container>
+    #if we receive on the port on localhost, we will forward it to the port on container (docker port is running on)
+    ports:
+      - 8000:8000
+    volumes:
+    #sinks our folder to docker app folder, ro - read only
+      - ./:/usr/src/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # env_file:
+    #   - ./.env
+    environment:
+      - DATABASE_HOSTNAME=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_PASSWORD=password123
+      - DATABASE_NAME=fastapi
+      - DATABASE_USERNAME=postgres
+      - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3110
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+  postgres:
+    #uses default image
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=fastapi
+    #volumes will keep the data and tables persistent
+    #path in the container to store the volume
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+#globally need so that multiple containers can access it
+volumes:
+  postgres-db:
